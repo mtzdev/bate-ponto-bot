@@ -16,7 +16,7 @@ class BatePonto(commands.Cog):
         self.client.add_view(view=batePonto())
 
     @commands.slash_command(description='[ADM] Gerencia o sistema do bate-ponto', guild_only=True)
-    @commands.has_any_role(1149072033729233037)
+    @commands.has_any_role(1148214580405874779)
     async def painel(self, ctx: discord.ApplicationContext):
         embed = discord.Embed(title='Bate-Ponto - STAFF', color=discord.Colour.gold(), description=f'**Gerenciamento do sistema de bate-ponto**\n\n'
                               '**•** `🔄 Reset Semanal`: Reseta as horas de todas as pessoas (nova semana)\n\n'
@@ -42,7 +42,7 @@ class BatePonto(commands.Cog):
         await ctx.respond(embed=embed)
 
     @commands.command()
-    @commands.has_any_role(1149072033729233037)
+    @commands.has_any_role(1148214580405874779)
     async def bateponto(self, ctx):
         embed = discord.Embed(title='Bate Ponto CHOQUE', color=discord.Colour.green(),
                               description='Sistema de bate-ponto da CHOQUE!\n\n'
