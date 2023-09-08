@@ -98,23 +98,26 @@ class finalizarPonto(View):
     @discord.ui.button(label='Finalizar', emoji='⏹', style=discord.ButtonStyle.danger)   # TODO: quem tiver cargo especifico, conseguir finalizar de qualquer pessoa
     async def end_callback(self, button, inter: discord.Interaction):
         cargo_adm = inter.guild.get_role(1148214580405874779)
-        if inter.user.id not in self._bateponto:
-            if cargo_adm in inter.user.roles and inter.message.id != self._bateponto[inter.user.id][1]:
-                for k, v in self._bateponto.items():
-                    if v[1] == inter.message.id:
-                        user_id = k
+        if cargo_adm in inter.user.roles:
+            for k, v in self._bateponto.items():
+                if v[1] == inter.message.id:
+                    user_id = k
+                    print(inter.message.id)
+                    print(self._bateponto[user_id][1])
+                    if inter.user.id != user_id and inter.message.id == self._bateponto[user_id][1]:
                         try:
                             self._bateponto.pop(user_id)
                         except KeyError:
-                            print('a')
                             pass
-                        break
-                await inter.message.delete()
-                return await inter.response.send_message(f'**Bate-ponto finalizado!** As horas não foram contabilizadas.', ephemeral=True)
-            return
+                        await inter.message.delete()
+                        return await inter.response.send_message(f'**Bate-ponto finalizado!** As horas não foram contabilizadas.', ephemeral=True)
+                    break
 
+        if inter.user.id not in self._bateponto:
+            return
         if inter.message.id != self._bateponto[inter.user.id][1]:
             return
+        
         msg = await inter.channel.fetch_message(self._bateponto[inter.user.id][1])
         await msg.delete()
 
