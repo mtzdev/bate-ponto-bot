@@ -17,7 +17,7 @@ class BatePonto(commands.Cog):
 
     @commands.slash_command(description='[ADM] Visualiza as pessoas que mais tem horas semanais')
     @commands.has_any_role(1148214580405874779)
-    async def ranking(self, ctx: discord.ApplicationContext, limit: Option(int, "Insira um limite para o ranking. (Padrão: 15)", default=15, name='Limite')):
+    async def ranking(self, ctx: discord.ApplicationContext, limit: Option(int, "Insira um limite para o ranking. (Padrão: 15)", default=15, name='limite')):
         with open('db.json', 'r') as f:
             data = json.load(f)
 
