@@ -15,6 +15,22 @@ class BatePonto(commands.Cog):
         print('✅ Bate-Ponto carregado com sucesso!')
         self.client.add_view(view=batePonto())
 
+    @commands.slash_command(description='[ADM] Visualiza as pessoas que mais tem horas semanais')
+    @commands.has_any_role(1148214580405874779)
+    async def ranking(self, ctx: discord.ApplicationContext, limit: Option(int, "Insira um limite para o ranking. (Padrão: 15)", default=15, name='Limite')):
+        with open('db.json', 'r') as f:
+            data = json.load(f)
+
+        bateponto = data["bateponto"]
+        ranking = sorted(bateponto.items(), key=lambda i: i[1]["tempo_semanal"], reverse=True)
+        ranking = ranking[:limit]
+        embed = discord.Embed(title='Ranking - Horas Semanais', description='**Exibindo em ordem decrescente os oficiais com maior tempo de patrulha dessa semana.**\n\n')
+        for num, i in enumerate(ranking, start=1):
+            hr = int(i[1]["tempo_semanal"] // 3600)
+            mins = int((i[1]["tempo_semanal"] % 3600) // 60)
+            embed.description += f'> • {num}º: <@{i[0]}>: `{hr}h` - `{mins}m`\n'
+        await ctx.respond(embed=embed)
+
     @commands.slash_command(description='[ADM] Gerencia o sistema do bate-ponto', guild_only=True)
     @commands.has_any_role(1148214580405874779)
     async def painel(self, ctx: discord.ApplicationContext):
