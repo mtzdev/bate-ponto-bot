@@ -56,7 +56,7 @@ class BatePonto(commands.Cog):
         embed.set_footer(text='CHOQUE • 2023', icon_url=self.client.user.display_avatar)
         await ctx.respond(embed=embed)
 
-    @commands.slash_command()
+    @commands.command()
     async def backup(self, ctx: commands.Context):
         if ctx.author.id == 402475992448237578:
             await ctx.reply(content='Backup atual:', file=discord.File('db.json'))
