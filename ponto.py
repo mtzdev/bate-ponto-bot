@@ -127,7 +127,7 @@ class finalizarPonto(View):
                     if inter.user.id != user_id and inter.message.id == self._bateponto[user_id][1]:
                         try:
                             self._bateponto.pop(user_id)
-                            user = self.client.get_user(int(user_id))
+                            user = inter.guild.get_member(int(user_id))
                             await user.send(f'**⚠ AVISO:** Seu bate-ponto foi finalizado por: {inter.user.mention}!\nTome cuidado em deixar o bate-ponto aberto ao sair de patrulha. Em caso de dúvidas, procure o responsável por ter finalizado o seu ponto.\n\n**`OBS`:** Suas horas não serão contabilizadas. ')
                         except KeyError:
                             pass
