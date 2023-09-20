@@ -1,3 +1,5 @@
+import asyncio
+from itertools import cycle
 import json
 import discord
 from discord.ext import commands
@@ -12,9 +14,21 @@ with open('config.json', 'r') as f:
     config = json.load(f)
     TOKEN = config['token']
 
+async def att_status():
+    status = cycle(["🛠️ Desenvolvido por @mtz._", "⚔ BMR CHOQUE"])
+    while True:
+        new_status = next(status) 
+        await client.change_presence(activity=discord.Game(name=new_status))
+        await asyncio.sleep(40)
+        if new_status == "⚔ BMR CHOQUE":  #Quando estiver no último status ↓
+            users = client.get_guild(1148068124751560815).member_count
+            await client.change_presence(activity=discord.Game(name=f'👮️ Gerenciando {users} policiai'))
+            await asyncio.sleep(50)
+
 @client.event
 async def on_ready():
     print('Bot está online!')
+    await att_status()
 
 @client.event
 async def on_member_join(member: discord.Member):

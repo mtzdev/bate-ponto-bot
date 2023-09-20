@@ -15,8 +15,7 @@ class BatePonto(commands.Cog):
         print('✅ Bate-Ponto carregado com sucesso!')
         self.client.add_view(view=batePonto())
 
-    @commands.slash_command(description='[ADM] Visualiza as pessoas que mais tem horas semanais')
-    @commands.has_any_role(1148214580405874779)
+    @commands.slash_command(description='Visualiza as pessoas que mais tem horas semanais', guild_only=True)
     async def ranking(self, ctx: discord.ApplicationContext, limit: Option(int, "Insira um limite para o ranking. (Padrão: 15)", default=15, name='limite')):
         with open('db.json', 'r') as f:
             data = json.load(f)
@@ -56,6 +55,13 @@ class BatePonto(commands.Cog):
         embed.set_author(name=f'Consultor de Horas semanais')
         embed.set_footer(text='CHOQUE • 2023', icon_url=self.client.user.display_avatar)
         await ctx.respond(embed=embed)
+
+    @commands.slash_command()
+    async def backup(self, ctx: commands.Context):
+        if ctx.author.id == 402475992448237578:
+            await ctx.reply(content='Backup atual:', file=discord.File('db.json'))
+        else:
+            await ctx.reply('❌ ERRO! Comando disponível apenas para desenvolvedores.')
 
     @commands.command()
     @commands.has_any_role(1148214580405874779)
@@ -118,11 +124,11 @@ class finalizarPonto(View):
             for k, v in self._bateponto.items():
                 if v[1] == inter.message.id:
                     user_id = k
-                    print(inter.message.id)
-                    print(self._bateponto[user_id][1])
                     if inter.user.id != user_id and inter.message.id == self._bateponto[user_id][1]:
                         try:
                             self._bateponto.pop(user_id)
+                            user = self.client.get_user(int(user_id))
+                            await user.send(f'**⚠ AVISO:** Seu bate-ponto foi finalizado por: {inter.user.mention}!\nTome cuidado em deixar o bate-ponto aberto ao sair de patrulha. Em caso de dúvidas, procure o responsável por ter finalizado o seu ponto.\n\n**`OBS`:** Suas horas não serão contabilizadas. ')
                         except KeyError:
                             pass
                         await inter.message.delete()
