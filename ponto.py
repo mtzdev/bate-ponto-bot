@@ -16,7 +16,7 @@ class BatePonto(commands.Cog):
         self.client.add_view(view=batePonto())
 
     @commands.slash_command(description='Visualiza as pessoas que mais tem horas semanais', guild_only=True)
-    async def ranking(self, ctx: discord.ApplicationContext, limit: Option(int, "Insira um limite para o ranking. (Padrão: 15)", default=15, name='limite')):
+    async def ranking(self, ctx: discord.ApplicationContext, limit: Option(int, "Insira um limite para o ranking. (Padrão: 10)", default=10, name='limite')):
         with open('db.json', 'r') as f:
             data = json.load(f)
 
@@ -27,7 +27,7 @@ class BatePonto(commands.Cog):
         for num, i in enumerate(ranking, start=1):
             hr = int(i[1]["tempo_semanal"] // 3600)
             mins = int((i[1]["tempo_semanal"] % 3600) // 60)
-            embed.description += f'> • {num}º: <@{i[0]}>: `{hr}h` - `{mins}m`\n'
+            embed.description += f'> **• {num}º:** <@{i[0]}>: `{hr}h` - `{mins}m`\n'
         await ctx.respond(embed=embed)
 
     @commands.slash_command(description='[ADM] Gerencia o sistema do bate-ponto', guild_only=True)

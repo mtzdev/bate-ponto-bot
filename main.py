@@ -22,7 +22,7 @@ async def att_status():
         await asyncio.sleep(40)
         if new_status == "⚔ BMR CHOQUE":  #Quando estiver no último status ↓
             users = client.get_guild(1148068124751560815).member_count
-            await client.change_presence(activity=discord.Game(name=f'👮️ Gerenciando {users} policiai'))
+            await client.change_presence(activity=discord.Game(name=f'👮️ Gerenciando {users} policiais!'))
             await asyncio.sleep(50)
 
 @client.event
