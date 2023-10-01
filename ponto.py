@@ -37,7 +37,7 @@ class BatePonto(commands.Cog):
                               '**•** `🔄 Reset Semanal`: Reseta as horas de todas as pessoas (nova semana)\n\n'
                               '**•** `➖ Reset Usuário`: Reseta as horas de um usuário especifíco\n\n'
                               '**•** `⚙ Modificar Usuário`: Modifica as horas semanais de alguém')
-        embed.set_footer(text='CHOQUE • 2023', icon_url=self.client.user.display_avatar)
+        embed.set_footer(text='GAT • 2023', icon_url=self.client.user.display_avatar)
         await ctx.respond(embed=embed, view=painelBatePonto(ctx))
 
     @commands.slash_command(description='Consulta suas horas semanais', guild_only=True)
@@ -53,7 +53,7 @@ class BatePonto(commands.Cog):
                             f'**• Total de Horas: `{hr}`**\n**• Total de Minutos: `{mins}`**\n**• Total de Segundos: `{segundos}`**'
                             '\n\n**OBS:** Caso o usuário esteja com o bate-ponto aberto, o tempo acima pode não estar atualizado.')
         embed.set_author(name=f'Consultor de Horas semanais')
-        embed.set_footer(text='CHOQUE • 2023', icon_url=self.client.user.display_avatar)
+        embed.set_footer(text='GAT • 2023', icon_url=self.client.user.display_avatar)
         await ctx.respond(embed=embed)
 
     @commands.command()
@@ -66,12 +66,12 @@ class BatePonto(commands.Cog):
     @commands.command()
     @commands.has_any_role(1148214580405874779)
     async def bateponto(self, ctx):
-        embed = discord.Embed(title='Bate Ponto CHOQUE', color=discord.Colour.green(),
-                              description='Sistema de bate-ponto da CHOQUE!\n\n'
+        embed = discord.Embed(title='Bate Ponto GAT', color=discord.Colour.green(),
+                              description='Sistema de bate-ponto da GAT!\n\n'
                               '**→** Clique em `▶️ Começar` quando iniciar sua patrulha!\n\n'
                               '**→** Para consultar seu relatório de horas clique em `🔍Consultar Horas`!\n\n'
                               '**• OBS: Ao terminar sua patrulha, lembre-se de clicar em `⏹ Finalizar` em seu bate-ponto.**')
-        embed.set_footer(text='CHOQUE • 2023', icon_url=self.client.user.display_avatar)
+        embed.set_footer(text='GAT • 2023', icon_url=self.client.user.display_avatar)
         await ctx.channel.send(embed=embed, view=batePonto())
 
 class batePonto(View):
@@ -91,7 +91,7 @@ class batePonto(View):
                               '**❗ Quando encerrar sua patrulha, encerre o bate-ponto no botão abaixo**',
                               color=discord.Colour.green())
         embed.set_author(name=f'Bate-Ponto de {inter.user}', icon_url=inter.user.display_avatar)
-        embed.set_footer(text='CHOQUE • 2023')
+        embed.set_footer(text='GAT • 2023')
         msg = await inter.channel.send(embed=embed, view=finalizarPonto(self._bateponto))
 
         await bateponto_data_user(inter.user.id) # Criar o usuário no banco de dados, se não existir
@@ -109,7 +109,7 @@ class batePonto(View):
                             f'**• Total de Horas: `{hr}`**\n**• Total de Minutos: `{mins}`**\n**• Total de Segundos: `{segundos}`**'
                             '\n\n**OBS:** Caso você esteja com o bate-ponto aberto, o tempo acima pode não estar atualizado.')
         embed.set_author(name=f'Consultor de Horas semanais')
-        embed.set_footer(text='CHOQUE • 2023')
+        embed.set_footer(text='GAT • 2023')
         await inter.response.send_message(embed=embed, ephemeral=True)
         
 class finalizarPonto(View):

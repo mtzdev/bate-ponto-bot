@@ -15,12 +15,12 @@ with open('config.json', 'r') as f:
     TOKEN = config['token']
 
 async def att_status():
-    status = cycle(["🛠️ Desenvolvido por @mtz._", "⚔ BMR CHOQUE"])
+    status = cycle(["🛠️ Desenvolvido por @mtz._", "⚔ BMR GAT"])
     while True:
         new_status = next(status) 
         await client.change_presence(activity=discord.Game(name=new_status))
         await asyncio.sleep(40)
-        if new_status == "⚔ BMR CHOQUE":  #Quando estiver no último status ↓
+        if new_status == "⚔ BMR GAT":  #Quando estiver no último status ↓
             users = client.get_guild(1148068124751560815).member_count
             await client.change_presence(activity=discord.Game(name=f'👮️ Gerenciando {users} policiais!'))
             await asyncio.sleep(50)
@@ -35,9 +35,9 @@ async def on_member_join(member: discord.Member):
     with open('config.json', 'r') as f:
         data = json.load(f)
     channel = client.get_channel(int(data["welcome_channel"]))
-    embed = discord.Embed(title='Novo Membro!', description=f'Bem vindo ao servidor da CHOQUE {member.mention}!\n\n'
+    embed = discord.Embed(title='Novo Membro!', description=f'Bem vindo ao servidor da GAT {member.mention}!\n\n'
                           '• ⚠ Se registre em <#1148213667641446431>!', color=discord.Colour.random())
-    embed.set_footer(text='CHOQUE • 2023')
+    embed.set_footer(text='GAT • 2023')
     cargo = member.guild.get_role(int(data["autorole"]))
     await member.add_roles(cargo)
     await channel.send(embed=embed)
@@ -76,7 +76,7 @@ async def addrole(ctx: discord.ApplicationContext, cargo: Option(discord.Role, "
 @commands.has_guild_permissions(administrator=True)
 async def embed(ctx: discord.ApplicationContext):
     embed = discord.Embed(title='Gerenciador de Embed', description='**Para enviar uma mensagem com o mesmo visual que esta (padrão embed), clique no botão abaixo, e preencha apenas os campos que você deseja.**', color=discord.Colour.red())
-    embed.set_footer(text='CHOQUE • 2023', icon_url=client.user.display_avatar)
+    embed.set_footer(text='GAT • 2023', icon_url=client.user.display_avatar)
     create_embed = Button(label='Criar Embed', style=discord.ButtonStyle.blurple, emoji='🛠')
     async def button_callback(inter: discord.Interaction):
         await inter.response.send_modal(embed_modal(ctx))
@@ -108,7 +108,7 @@ class embed_modal(Modal):
             embed.set_image(url=self.children[3].value)
     
         embed.color = color()
-        embed.set_footer(text='CHOQUE • 2023', icon_url=client.user.display_avatar)
+        embed.set_footer(text='GAT • 2023', icon_url=client.user.display_avatar)
         await inter.channel.send(embed=embed)
         await inter.response.send_message(f'✅ Embed criada com sucesso em {inter.channel.mention}!', ephemeral=True)
 
