@@ -16,11 +16,11 @@ class BatePonto(commands.Cog):
         print('✅ Bate-Ponto carregado com sucesso!')
         self.client.add_view(view=batePonto())
 
-    @commands.slash_command(description='[ADM] Adiciona horas para uma pessoa no bate-ponto', guild_only=True)
+    @commands.slash_command(description='[ADM] Adiciona horas/minutos para uma pessoa no bate-ponto', guild_only=True)
     @commands.has_any_role(1206390064964182097)
-    async def addhoras(self, ctx: discord.ApplicationContext, usuario: Option(discord.Member, 'Selecione o usuário', required=True),
+    async def addtempo(self, ctx: discord.ApplicationContext, usuario: Option(discord.Member, 'Selecione o usuário', required=True),
                     horas: Option(int, "Digite a quantidade de horas", required=True, min_value=0),
-                    minutos: Option(int, "Digite a quantidade de minutos", required=True, min_value=0),
+                    minutos: Option(int, "Digite a quantidade de minutos", required=True, min_value=0, max_value=59),
                     motivo: Option(str, "Digite o motivo da adição de horas (Ficará em exibição no log)", required=True)):
         try:
             with open('db.json', 'r+') as f:
@@ -34,12 +34,54 @@ class BatePonto(commands.Cog):
         except KeyError:
             await ctx.respond(f'ERRO! O usuário {usuario.mention} não possui registro no banco de dados. Para se registrar é necessário abrir o bate-ponto pelo menos 1 vez.')
         else:
+            try:
+                await usuario.send(f'**⚠ AVISO!** Você sofreu uma alteração nas horas patrulhadas!\n**→ Staff:** {ctx.author.mention}\n**→ Adicionou:** {horas} hora(s) e {minutos} minuto(s)\n**→ Motivo:** {motivo}\n\n`Em caso de problemas ou dúvidas, questione o staff mencionado acima.`')
+            except (discord.HTTPException, discord.Forbidden):
+                pass
             canal_log = ctx.guild.get_channel(1207856008391692311)
             embed_log = discord.Embed(description=f'**→ `Staff`: {ctx.author.mention}**\n**→ `Policial`: {usuario.mention}**\n'
                 f'**→ `Horas adicionadas`: {horas} horas e {minutos} minutos**\n**→ `Motivo inserido`: {motivo}**', colour=discord.Colour.green())
 
             embed_log.set_author(name='LOG: Adição de Horas', icon_url=self.client.user.display_avatar)
             await canal_log.send(embed=embed_log)
+
+
+    @commands.slash_command(description='[ADM] Remove horas/minutos de uma pessoa no bate-ponto', guild_only=True)
+    @commands.has_any_role(1206390064964182097)
+    async def deltempo(self, ctx: discord.ApplicationContext, usuario: Option(discord.Member, 'Selecione o usuário', required=True),
+                    horas: Option(int, "Digite a quantidade de horas", required=True, min_value=0),
+                    minutos: Option(int, "Digite a quantidade de minutos", required=True, min_value=0, max_value=59),
+                    motivo: Option(str, "Digite o motivo da remoção de horas (Ficará em exibição no log)", required=True)):
+        try:
+            with open('db.json', 'r+') as f:
+                data = json.load(f)
+                total = (int(horas) * 3600) + (int(minutos) * 60)
+                print(total)
+                print(data["bateponto"][str(usuario.id)]["tempo_semanal"])
+                if total > data["bateponto"][str(usuario.id)]["tempo_semanal"]:
+                    total_sec = data["bateponto"][str(usuario.id)]["tempo_semanal"]
+                    hr = int(total_sec // 3600)
+                    mins = int((total_sec % 3600) // 60)
+                    return await ctx.respond(f'**ERRO!** Diminua o tempo inserido. O usuário possui apenas {hr} horas e {mins} minutos')
+                data["bateponto"][str(usuario.id)]["tempo_semanal"] -= total
+                f.seek(0)
+                json.dump(data, f, indent=4)
+                f.truncate()
+            await ctx.respond(f'Sucesso! Você removeu `{horas}` horas e `{minutos}` minutos de {usuario.mention}.')
+        except KeyError:
+            await ctx.respond(f'ERRO! O usuário {usuario.mention} não possui registro no banco de dados. Para se registrar é necessário abrir o bate-ponto pelo menos 1 vez.')
+        else:
+            try:
+                await usuario.send(f'**⚠ AVISO!** Você sofreu uma alteração nas horas patrulhadas!\n**→ Staff:** {ctx.author.mention}\n**→ Removeu:** {horas} hora(s) e {minutos} minuto(s)\n**→ Motivo:** {motivo}\n\n`Em caso de problemas ou dúvidas, questione o staff mencionado acima.`')
+            except (discord.HTTPException, discord.Forbidden):
+                pass
+            canal_log = ctx.guild.get_channel(1207856008391692311)
+            embed_log = discord.Embed(description=f'**→ `Staff`: {ctx.author.mention}**\n**→ `Policial`: {usuario.mention}**\n'
+                f'**→ `Horas removidas`: {horas} horas e {minutos} minutos**\n**→ `Motivo inserido`: {motivo}**', colour=discord.Colour.red())
+
+            embed_log.set_author(name='LOG: Redução de Horas', icon_url=self.client.user.display_avatar)
+            await canal_log.send(embed=embed_log)
+
 
 
     @commands.slash_command(description='Visualiza as pessoas que mais tem horas semanais', guild_only=True)

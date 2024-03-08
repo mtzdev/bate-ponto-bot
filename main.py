@@ -9,11 +9,11 @@ from discord.commands import Option
 from discord.ui import InputText, Modal, Button, View
 from datetime import datetime
 
+CONFIG_FILE = 'config.json'
 client = commands.Bot(command_prefix=".", help_command=None, intents=discord.Intents().all())
-
 client.load_extension('ponto')
 
-with open('config.json', 'r') as f:
+with open(CONFIG_FILE, 'r') as f:
     config = json.load(f)
     TOKEN = config['token']
 
@@ -35,7 +35,7 @@ async def on_ready():
 
 @client.event
 async def on_member_join(member: discord.Member):
-    with open('config.json', 'r') as f:
+    with open(CONFIG_FILE, 'r') as f:
         data = json.load(f)
     channel = client.get_channel(int(data["welcome_channel"]))
     embed = discord.Embed(title='Novo Membro!', description=f'Bem vindo ao servidor da Policia Militar BMR {member.mention}!\n\n'
@@ -74,6 +74,15 @@ async def on_application_command_error(ctx: discord.ApplicationContext, error: d
     if isinstance(error, commands.MissingAnyRole):
         return await ctx.respond('**❌ ERRO!** Você não tem permissão para executar este comando.\n'
                                  f'Cargo Necessário: `{" - ".join([permissions[perm] for perm in error.missing_permissions])}`')
+
+    canallog = client.get_channel(1215487048668946432)
+    if ctx.command is None:
+        comando = "Nenhum/Invalído"
+    else:
+        comando = ctx.command
+    embedlog = discord.Embed(title='ERRO!', description=f'Comando utilizado: `{comando}`\nServidor: `{ctx.guild.name} / {ctx.guild.id}`\nCanal do comando: `{ctx.channel} / {ctx.channel.id}`\nAutor do comando: {ctx.author.mention} `/ {ctx.author.id}`\n\n**ERRO:**\n```py\n{error}\n```', color=discord.Colour.red())
+    embedlog.set_footer(text='Developed by mtz._')
+    await canallog.send(embed=embedlog)
 
 @client.slash_command(description='Gera o relatório de prisão automaticamente')
 async def prisao(ctx: discord.ApplicationContext,
@@ -157,20 +166,20 @@ async def clear(ctx: discord.ApplicationContext,
 @commands.has_guild_permissions(administrator=True)
 async def setar_entrada(ctx: discord.ApplicationContext,
                         canal: Option(discord.TextChannel, 'Insira o canal de entrada', required=True)):
-    with open('config.json', 'r') as f:
+    with open(CONFIG_FILE, 'r') as f:
         data = json.load(f)
     data["welcome_channel"] = int(canal.id)
-    with open('config.json', 'w') as f:
+    with open(CONFIG_FILE, 'w') as f:
         json.dump(data, f, indent=4)
     await ctx.respond(f'Sucesso! Canal de entrada definido em: {canal.mention}', delete_after=10.0)
 
 @client.slash_command(description='[ADM] Seta o cargo automático para quem entrar no discord', guild_only=True)
 @commands.has_guild_permissions(administrator=True)
 async def setar_autorole(ctx: discord.ApplicationContext, cargo: Option(discord.Role, 'Selecione o cargo', required=True)):
-    with open('config.json', 'r') as f:
+    with open(CONFIG_FILE, 'r') as f:
         data = json.load(f)
     data["autorole"] = int(cargo.id)
-    with open('config.json', 'w') as f:
+    with open(CONFIG_FILE, 'w') as f:
         json.dump(data, f, indent=4)
     await ctx.respond(f'Sucesso! Cargo inicial setado em {cargo.mention}', delete_after=10.0)
 
