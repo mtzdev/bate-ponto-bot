@@ -1,37 +1,67 @@
 {
     "bateponto": {
         "985371967664320523": {
-            "tempo_semanal": 59760
+            "tempo_semanal": 80410
         },
         "1187547568490684488": {
-            "tempo_semanal": 48780
+            "tempo_semanal": 43010
         },
         "402475992448237578": {
-            "tempo_semanal": 46620
+            "tempo_semanal": 30937
         },
         "1047683789402411109": {
-            "tempo_semanal": 36600
+            "tempo_semanal": 3361
         },
         "622118239517802516": {
-            "tempo_semanal": 22500
+            "tempo_semanal": 3965
         },
         "750780177948213278": {
-            "tempo_semanal": 16380
+            "tempo_semanal": 44635
         },
         "874176699166781470": {
-            "tempo_semanal": 11100
+            "tempo_semanal": 1748
         },
         "1171227290122846321": {
-            "tempo_semanal": 9960
+            "tempo_semanal": 27850
         },
         "835248472499814420": {
-            "tempo_semanal": 7020
+            "tempo_semanal": 85216
         },
         "1050945107332960367": {
-            "tempo_semanal": 6360
+            "tempo_semanal": 0
         },
         "967932204967677992": {
-            "tempo_semanal": 4380
+            "tempo_semanal": 66300
+        },
+        "937735977315741728": {
+            "tempo_semanal": 0
+        },
+        "830073487284240434": {
+            "tempo_semanal": 29969
+        },
+        "418184266212573194": {
+            "tempo_semanal": 3338
+        },
+        "717367582608457764": {
+            "tempo_semanal": 9314
+        },
+        "1049572444773560320": {
+            "tempo_semanal": 23613
+        },
+        "589807740478554112": {
+            "tempo_semanal": 0
+        },
+        "852909323445469215": {
+            "tempo_semanal": 28784
+        },
+        "771539624409432065": {
+            "tempo_semanal": 0
+        },
+        "585994084968169498": {
+            "tempo_semanal": 106286
+        },
+        "649251285731770395": {
+            "tempo_semanal": 18413
         }
     }
 }
