@@ -18,13 +18,13 @@ with open(CONFIG_FILE, 'r') as f:
     TOKEN = config['token']
 
 async def att_status():
-    status = cycle(["🛠️ Desenvolvido por @mtz._", "⚔ BMR PM"])
+    status = cycle(["🛠️ Desenvolvido por @mtz._", "⚔ BRAZZA PM"])
     while True:
         new_status = next(status)
         await client.change_presence(activity=discord.Game(name=new_status))
         await asyncio.sleep(40)
-        if new_status == "⚔ BMR PM":  # Quando estiver no último status ↓
-            users = client.get_guild(1206241928258002974).member_count
+        if new_status == "⚔ BRAZZA PM":  # Quando estiver no último status ↓
+            users = client.get_guild(1267945413139238922).member_count
             await client.change_presence(activity=discord.Game(name=f'👮️ Gerenciando {users} policiais!'))
             await asyncio.sleep(50)
 
@@ -35,15 +35,16 @@ async def on_ready():
 
 @client.event
 async def on_member_join(member: discord.Member):
-    with open(CONFIG_FILE, 'r') as f:
-        data = json.load(f)
-    channel = client.get_channel(int(data["welcome_channel"]))
-    embed = discord.Embed(title='Novo Membro!', description=f'Bem vindo ao servidor da Policia Militar BMR {member.mention}!\n\n'
-                          '• ⚠ Se registre em <#1207856024749473832>!', color=discord.Colour.random())
-    embed.set_footer(text='BMR • Policia Militar • 2024')
-    await channel.send(embed=embed)
-    cargo = member.guild.get_role(int(data["autorole"]))
-    await member.add_roles(cargo)
+    if member.guild.id == 1267945413139238922:
+        with open(CONFIG_FILE, 'r') as f:
+            data = json.load(f)
+        channel = client.get_channel(int(data["welcome_channel"]))
+        embed = discord.Embed(title='Novo Membro!', description=f'Bem vindo ao servidor da Policia Militar BRAZZA {member.mention}!\n\n'
+                            '• ⚠ Se registre em <#1268404417359777843>!', color=discord.Colour.random())
+        embed.set_footer(text='BRAZZA • Policia Militar • 2024')
+        await channel.send(embed=embed)
+        cargo = member.guild.get_role(int(data["autorole"]))
+        await member.add_roles(cargo)
 
 @client.event
 async def on_application_command_error(ctx: discord.ApplicationContext, error: discord.DiscordException):
@@ -61,7 +62,7 @@ async def on_application_command_error(ctx: discord.ApplicationContext, error: d
 
     if isinstance(error, commands.MissingAnyRole):
         return await ctx.respond('**❌ ERRO!** Você não tem permissão para executar este comando.\n'
-                                 f'Cargo Necessário: <@&{error.missing_roles[0]}>')
+                                 f'> Cargo Necessário: <@&{error.missing_roles[0]}>')
 
     if isinstance(error, commands.MissingPermissions):
         permissions = {
@@ -69,13 +70,9 @@ async def on_application_command_error(ctx: discord.ApplicationContext, error: d
             "manage_messages": "Gerenciar Mensagens"
         }
         return await ctx.respond('**❌ ERRO!** Você não tem permissão para executar este comando.\n'
-                                 f'Permissão Necessária: `{" - ".join([permissions[perm] for perm in error.missing_permissions])}`')
+                                 f'> Permissão Necessária: `{" - ".join([permissions[perm] for perm in error.missing_permissions])}`')
 
-    if isinstance(error, commands.MissingAnyRole):
-        return await ctx.respond('**❌ ERRO!** Você não tem permissão para executar este comando.\n'
-                                 f'Cargo Necessário: `{" - ".join([permissions[perm] for perm in error.missing_permissions])}`')
-
-    canallog = client.get_channel(1215487048668946432)
+    canallog = client.get_channel(1268654669996232906)
     if ctx.command is None:
         comando = "Nenhum/Invalído"
     else:
@@ -84,7 +81,7 @@ async def on_application_command_error(ctx: discord.ApplicationContext, error: d
     embedlog.set_footer(text='Developed by mtz._')
     await canallog.send(embed=embedlog)
 
-@client.slash_command(description='Gera o relatório de prisão automaticamente')
+@client.slash_command(description='Gera o relatório de prisão automaticamente', contexts={discord.InteractionContextType.guild})
 async def prisao(ctx: discord.ApplicationContext,
                 policias: Option(str, 'Digite o Nome ou ID dos policiais envolvidos', required=True),
                 acusado: Option(str, 'Digite o Nome e ID do cidadão a ser preso', required=True, min_length=5),
@@ -100,23 +97,23 @@ async def prisao(ctx: discord.ApplicationContext,
     em.set_author(name=f'Relatório de prisão criado por: {ctx.author.name}', icon_url=ctx.author.display_avatar)
     if foto:
         em.set_image(url=foto.url)
-    em.set_footer(text=f'{datetime.now(pytz.timezone("America/Sao_Paulo")).strftime("%d/%m/%Y - %H:%M")} | BMR Policia Militar')
-    canal_prisao = ctx.guild.get_channel(1210424764464766986)
+    em.set_footer(text=f'{datetime.now(pytz.timezone("America/Sao_Paulo")).strftime("%d/%m/%Y - %H:%M")} | BRAZZA Policia Militar')
+    canal_prisao = ctx.guild.get_channel(1268404437366607946)
     msg = await canal_prisao.send(embed=em)
     await ctx.respond(f'**✅ Sucesso!** Relatório de prisão criado! {msg.jump_url}', ephemeral=True)
 
-@client.slash_command(description='[ADM] Adiciona cargo a um usuário', guild_only=True)
+@client.slash_command(description='[ADM] Adiciona cargo a um usuário', contexts={discord.InteractionContextType.guild})
 @commands.has_guild_permissions(administrator=True)
 async def addrole(ctx: discord.ApplicationContext, cargo: Option(discord.Role, "Digite o cargo desejado", required=True),
                   user: Option(discord.Member, "Mencione um usuário", required=True)):
     await user.add_roles(cargo)
     await ctx.respond(f'Sucesso! Você atribuiu o cargo {cargo.mention} ao {user.mention}!')
 
-@client.slash_command(description='Envia uma mensagem EMBED!', guild_only=True)
+@client.slash_command(description='Envia uma mensagem EMBED!', contexts={discord.InteractionContextType.guild})
 @commands.has_guild_permissions(administrator=True)
 async def embed(ctx: discord.ApplicationContext):
     embed = discord.Embed(title='Gerenciador de Embed', description='**Para enviar uma mensagem com o mesmo visual que esta (padrão embed), clique no botão abaixo, e preencha apenas os campos que você deseja.**', color=discord.Colour.red())
-    embed.set_footer(text='BMR • Policia Militar • 2024', icon_url=client.user.display_avatar)
+    embed.set_footer(text='BRAZZA • Policia Militar • 2024', icon_url=client.user.display_avatar)
     create_embed = Button(label='Criar Embed', style=discord.ButtonStyle.blurple, emoji='🛠')
     async def button_callback(inter: discord.Interaction):
         await inter.response.send_modal(embed_modal(ctx))
@@ -149,11 +146,11 @@ class embed_modal(Modal):
             embed.set_image(url=self.children[3].value)
 
         embed.color = color()
-        embed.set_footer(text='BMR • Policia Militar • 2024', icon_url=client.user.display_avatar)
+        embed.set_footer(text='BRAZZA • Policia Militar • 2024', icon_url=client.user.display_avatar)
         await inter.channel.send(embed=embed)
         await inter.response.send_message(f'✅ Embed criada com sucesso em {inter.channel.mention}!', ephemeral=True)
 
-@client.slash_command(description='Limpa mensagens do canal', guild_only=True)
+@client.slash_command(description='Limpa mensagens do canal', contexts={discord.InteractionContextType.guild})
 @commands.has_guild_permissions(manage_messages=True)
 async def clear(ctx: discord.ApplicationContext,
                 quantidade: Option(int, 'Insira a quantidade de mensagens a serem deletadas', required=True)):
@@ -162,7 +159,7 @@ async def clear(ctx: discord.ApplicationContext,
     )
     await ctx.respond(f'Foram deletadas {msgs} mensagens!', delete_after=8.0)
 
-@client.slash_command(description='[ADM] Seta o canal de entrada', guild_only=True)
+@client.slash_command(description='[ADM] Seta o canal de entrada', contexts={discord.InteractionContextType.guild})
 @commands.has_guild_permissions(administrator=True)
 async def setar_entrada(ctx: discord.ApplicationContext,
                         canal: Option(discord.TextChannel, 'Insira o canal de entrada', required=True)):
@@ -173,7 +170,7 @@ async def setar_entrada(ctx: discord.ApplicationContext,
         json.dump(data, f, indent=4)
     await ctx.respond(f'Sucesso! Canal de entrada definido em: {canal.mention}', delete_after=10.0)
 
-@client.slash_command(description='[ADM] Seta o cargo automático para quem entrar no discord', guild_only=True)
+@client.slash_command(description='[ADM] Seta o cargo automático para quem entrar no discord', contexts={discord.InteractionContextType.guild})
 @commands.has_guild_permissions(administrator=True)
 async def setar_autorole(ctx: discord.ApplicationContext, cargo: Option(discord.Role, 'Selecione o cargo', required=True)):
     with open(CONFIG_FILE, 'r') as f:

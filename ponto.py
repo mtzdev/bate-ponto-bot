@@ -16,8 +16,8 @@ class BatePonto(commands.Cog):
         print('✅ Bate-Ponto carregado com sucesso!')
         self.client.add_view(view=batePonto())
 
-    @commands.slash_command(description='[ADM] Adiciona horas/minutos para uma pessoa no bate-ponto', guild_only=True)
-    @commands.has_any_role(1206390064964182097)
+    @commands.slash_command(description='[ADM] Adiciona horas/minutos para uma pessoa no bate-ponto', contexts={discord.InteractionContextType.guild})
+    @commands.has_any_role(1268404356915527843)
     async def addtempo(self, ctx: discord.ApplicationContext, usuario: Option(discord.Member, 'Selecione o usuário', required=True),
                     horas: Option(int, "Digite a quantidade de horas", required=True, min_value=0),
                     minutos: Option(int, "Digite a quantidade de minutos", required=True, min_value=0, max_value=59),
@@ -38,7 +38,7 @@ class BatePonto(commands.Cog):
                 await usuario.send(f'**⚠ AVISO!** Você sofreu uma alteração nas horas patrulhadas!\n**→ Staff:** {ctx.author.mention}\n**→ Adicionou:** {horas} hora(s) e {minutos} minuto(s)\n**→ Motivo:** {motivo}\n\n`Em caso de problemas ou dúvidas, questione o staff mencionado acima.`')
             except (discord.HTTPException, discord.Forbidden):
                 pass
-            canal_log = ctx.guild.get_channel(1207856008391692311)
+            canal_log = ctx.guild.get_channel(1268404402654548069)
             embed_log = discord.Embed(description=f'**→ `Staff`: {ctx.author.mention}**\n**→ `Policial`: {usuario.mention}**\n'
                 f'**→ `Horas adicionadas`: {horas} horas e {minutos} minutos**\n**→ `Motivo inserido`: {motivo}**', colour=discord.Colour.green())
 
@@ -46,8 +46,8 @@ class BatePonto(commands.Cog):
             await canal_log.send(embed=embed_log)
 
 
-    @commands.slash_command(description='[ADM] Remove horas/minutos de uma pessoa no bate-ponto', guild_only=True)
-    @commands.has_any_role(1206390064964182097)
+    @commands.slash_command(description='[ADM] Remove horas/minutos de uma pessoa no bate-ponto', contexts={discord.InteractionContextType.guild})
+    @commands.has_any_role(1268404356915527843)
     async def deltempo(self, ctx: discord.ApplicationContext, usuario: Option(discord.Member, 'Selecione o usuário', required=True),
                     horas: Option(int, "Digite a quantidade de horas", required=True, min_value=0),
                     minutos: Option(int, "Digite a quantidade de minutos", required=True, min_value=0, max_value=59),
@@ -56,8 +56,6 @@ class BatePonto(commands.Cog):
             with open('db.json', 'r+') as f:
                 data = json.load(f)
                 total = (int(horas) * 3600) + (int(minutos) * 60)
-                print(total)
-                print(data["bateponto"][str(usuario.id)]["tempo_semanal"])
                 if total > data["bateponto"][str(usuario.id)]["tempo_semanal"]:
                     total_sec = data["bateponto"][str(usuario.id)]["tempo_semanal"]
                     hr = int(total_sec // 3600)
@@ -75,7 +73,7 @@ class BatePonto(commands.Cog):
                 await usuario.send(f'**⚠ AVISO!** Você sofreu uma alteração nas horas patrulhadas!\n**→ Staff:** {ctx.author.mention}\n**→ Removeu:** {horas} hora(s) e {minutos} minuto(s)\n**→ Motivo:** {motivo}\n\n`Em caso de problemas ou dúvidas, questione o staff mencionado acima.`')
             except (discord.HTTPException, discord.Forbidden):
                 pass
-            canal_log = ctx.guild.get_channel(1207856008391692311)
+            canal_log = ctx.guild.get_channel(1268404402654548069)
             embed_log = discord.Embed(description=f'**→ `Staff`: {ctx.author.mention}**\n**→ `Policial`: {usuario.mention}**\n'
                 f'**→ `Horas removidas`: {horas} horas e {minutos} minutos**\n**→ `Motivo inserido`: {motivo}**', colour=discord.Colour.red())
 
@@ -84,7 +82,7 @@ class BatePonto(commands.Cog):
 
 
 
-    @commands.slash_command(description='Visualiza as pessoas que mais tem horas semanais', guild_only=True)
+    @commands.slash_command(description='Visualiza as pessoas que mais tem horas semanais', contexts={discord.InteractionContextType.guild})
     async def ranking(self, ctx: discord.ApplicationContext, limit: Option(int, "Insira um limite para o ranking. (Padrão: 10)", default=10, name='limite')):
         with open('db.json', 'r') as f:
             data = json.load(f)
@@ -99,17 +97,17 @@ class BatePonto(commands.Cog):
             embed.description += f'> **• {num}º:** <@{i[0]}>: `{hr}h` - `{mins}m`\n'                        # type: ignore
         await ctx.respond(embed=embed)
 
-    @commands.slash_command(description='[ADM] Gerencia o sistema do bate-ponto', guild_only=True)
-    @commands.has_any_role(1206390064964182097)
+    @commands.slash_command(description='[ADM] Gerencia o sistema do bate-ponto', contexts={discord.InteractionContextType.guild})
+    @commands.has_any_role(1268404356915527843)
     async def painel(self, ctx: discord.ApplicationContext):
         embed = discord.Embed(title='Bate-Ponto - STAFF', color=discord.Colour.gold(), description='**Gerenciamento do sistema de bate-ponto**\n\n'
                               '**•** `🔄 Reset Semanal`: Reseta as horas de todas as pessoas (nova semana)\n\n'
                               '**•** `➖ Reset Usuário`: Reseta as horas de um usuário especifíco\n\n'
                               '**•** `⚙ Modificar Usuário`: Modifica as horas semanais de alguém')
-        embed.set_footer(text='BMR • Policia Militar • 2024', icon_url=self.client.user.display_avatar)
+        embed.set_footer(text='BRAZZA • Policia Militar • 2024', icon_url=self.client.user.display_avatar)
         await ctx.respond(embed=embed, view=painelBatePonto(ctx, self.client))
 
-    @commands.slash_command(description='Consulta suas horas semanais', guild_only=True)
+    @commands.slash_command(description='Consulta suas horas semanais', contexts={discord.InteractionContextType.guild})
     async def consultar_horas(self, ctx, _user: Option(discord.Member, 'Selecione o usuário', required=False, name='usuário')):
         user = ctx.author if _user is None else _user
         total_secs = await bateponto_data_user(user.id)
@@ -122,7 +120,7 @@ class BatePonto(commands.Cog):
                             f'**• Total de Horas: `{hr}`**\n**• Total de Minutos: `{mins}`**\n**• Total de Segundos: `{segundos}`**'
                             '\n\n**OBS:** Caso o usuário esteja com o bate-ponto aberto, o tempo acima pode não estar atualizado.')
         embed.set_author(name='Consultor de Horas semanais')
-        embed.set_footer(text='BMR • Policia Militar • 2024', icon_url=self.client.user.display_avatar)
+        embed.set_footer(text='BRAZZA • Policia Militar • 2024', icon_url=self.client.user.display_avatar)
         await ctx.respond(embed=embed)
 
     @commands.command()
@@ -133,14 +131,14 @@ class BatePonto(commands.Cog):
             await ctx.reply('❌ ERRO! Comando disponível apenas para desenvolvedores.')
 
     @commands.command()
-    @commands.has_any_role(1206390064964182097)
+    @commands.has_any_role(1268404356915527843)
     async def bateponto(self, ctx):
         embed = discord.Embed(title='Bate Ponto Policia Militar', color=discord.Colour.green(),
                               description='Sistema de bate-ponto da PM!\n\n'
                               '**→** Clique em `▶️ Começar` quando iniciar sua patrulha!\n\n'
                               '**→** Para consultar seu relatório de horas clique em `🔍Consultar Horas`!\n\n'
                               '**• OBS: Ao terminar sua patrulha, lembre-se de clicar em `⏹ Finalizar` em seu bate-ponto.**')
-        embed.set_footer(text='BMR • Policia Militar • 2024', icon_url=self.client.user.display_avatar)
+        embed.set_footer(text='BRAZZA • Policia Militar • 2024', icon_url=self.client.user.display_avatar)
         await ctx.channel.send(embed=embed, view=batePonto())
 
 class batePonto(View):
@@ -161,15 +159,15 @@ class batePonto(View):
                               '**❗ Quando encerrar sua patrulha, encerre o bate-ponto no botão abaixo**',
                               color=discord.Colour.green())
         embed.set_author(name=f'Bate-Ponto de {inter.user}', icon_url=inter.user.display_avatar)
-        embed.set_footer(text='BMR • Policia Militar • 2024')
+        embed.set_footer(text='BRAZZA • Policia Militar • 2024')
         msg = await inter.channel.send(embed=embed, view=finalizarPonto(self._bateponto))
 
         await bateponto_data_user(inter.user.id)  # Criar o usuário no banco de dados, se não existir
         self._bateponto[inter.user.id] = [horario, msg.id]
 
-        canal_log = inter.guild.get_channel(1207856009880666132)
+        canal_log = inter.guild.get_channel(1268404402654548069)
         embed_log = discord.Embed(description=f'**→ `Status Bate-Ponto`: Aberto**\n**→ `Policial`: {inter.user.mention}**\n'
-            f'**→ `Horário`: {datetime.datetime.now(timezone("America/Sao_Paulo")).strftime("%d/%m/%Y, %H:%M")}**\n', colour=discord.Colour.blue())
+            f'**→ `Horário`: {datetime.datetime.now(timezone("America/Sao_Paulo")).strftime("%d/%m/%Y, %H:%M:%S")}**\n', colour=discord.Colour.blue())
 
         embed_log.set_author(name=f'LOG: Bate-Ponto aberto por: {inter.user.name}', icon_url=inter.user.display_avatar)
         await canal_log.send(embed=embed_log)
@@ -186,7 +184,7 @@ class batePonto(View):
                             f'**• Total de Horas: `{hr}`**\n**• Total de Minutos: `{mins}`**\n**• Total de Segundos: `{segundos}`**'
                             '\n\n**OBS:** Caso você esteja com o bate-ponto aberto, o tempo acima pode não estar atualizado.')
         embed.set_author(name='Consultor de Horas semanais')
-        embed.set_footer(text='BMR • Policia Militar • 2024')
+        embed.set_footer(text='BRAZZA • Policia Militar • 2024')
         await inter.response.send_message(embed=embed, ephemeral=True)
 
 class finalizarPonto(View):
@@ -194,9 +192,9 @@ class finalizarPonto(View):
         super().__init__(timeout=None)
         self._bateponto = controle_bateponto
 
-    @discord.ui.button(label='Finalizar', emoji='⏹', style=discord.ButtonStyle.danger)   # TODO: quem tiver cargo especifico, conseguir finalizar de qualquer pessoa
+    @discord.ui.button(label='Finalizar', emoji='⏹', style=discord.ButtonStyle.danger)
     async def end_callback(self, button, inter: discord.Interaction):
-        cargo_adm = inter.guild.get_role(1206390064964182097)
+        cargo_adm = inter.guild.get_role(1268404356915527843)
         if cargo_adm in inter.user.roles:
             for k, v in self._bateponto.items():
                 if v[1] == inter.message.id:
@@ -209,12 +207,12 @@ class finalizarPonto(View):
                             horas, minutos = int(segundos_totais // 3600), int((segundos_totais % 3600) // 60)
                             self._bateponto.pop(user_id)
                             user = inter.guild.get_member(int(user_id))
-                            canal_log = inter.guild.get_channel(1207856009880666132)
+                            canal_log = inter.guild.get_channel(1268404402654548069)
                             embed_log = discord.Embed(description=f'**→ `Status Bate-Ponto`: Fechado por {inter.user.mention}** *(horas não contabilizadas)*\n**→ `Policial`: {user.mention}**\n'
-                                f'**→ `Horário`: {datetime.datetime.now(timezone("America/Sao_Paulo")).strftime("%d/%m/%Y, %H:%M")}**\n**→ `Horário total trabalhado`: {str(horas).zfill(2)} horas e {str(minutos).zfill(2)} minutos**', colour=discord.Colour.yellow())
-                            embed_log.set_author(name='LOG: Bate-Ponto fechado por Alto Comando', icon_url=inter.user.display_avatar)
+                                f'**→ `Horário`: {datetime.datetime.now(timezone("America/Sao_Paulo")).strftime("%d/%m/%Y, %H:%M:%S")}**\n**→ `Horário total trabalhado`: {str(horas).zfill(2)} horas e {str(minutos).zfill(2)} minutos**', colour=discord.Colour.yellow())
+                            embed_log.set_author(name='LOG: Bate-Ponto fechado por Alto Comando/Staff', icon_url=inter.user.display_avatar)
                             await canal_log.send(embed=embed_log)
-                            await user.send(f'**⚠ AVISO:** Seu bate-ponto foi finalizado por: {inter.user.mention}!\nTome cuidado em deixar o bate-ponto aberto ao sair de patrulha. Em caso de dúvidas, procure o responsável por ter finalizado o seu ponto.\n\n**`OBS`:** Suas horas não serão contabilizadas. ')
+                            await user.send(f'**⚠ AVISO:** Seu bate-ponto foi finalizado por: {inter.user.mention}!\nTome cuidado em deixar o bate-ponto aberto ao sair de patrulha. Em caso de dúvidas, procure o responsável por ter finalizado o seu ponto.\n\n**`OBS`:** Suas horas não foram contabilizadas.')
                         except (KeyError, discord.HTTPException, discord.Forbidden):
                             pass
                         await inter.message.delete()
@@ -244,10 +242,10 @@ class finalizarPonto(View):
 
         await inter.response.send_message(f'**✅ Bate-ponto fechado!**\nTempo total de PTR: `{horas}` horas e `{minutos}` minutos', ephemeral=True)
 
-        canal_log = inter.guild.get_channel(1207856009880666132)
+        canal_log = inter.guild.get_channel(1268404402654548069)
 
         embed_log = discord.Embed(description=f'**→ `Status Bate-Ponto`: Fechado**\n**→ `Policial`: {inter.user.mention}**\n'
-            f'**→ `Horário`: {datetime.datetime.now(timezone("America/Sao_Paulo")).strftime("%d/%m/%Y, %H:%M")}**\n'
+            f'**→ `Horário`: {datetime.datetime.now(timezone("America/Sao_Paulo")).strftime("%d/%m/%Y, %H:%M:%S")}**\n'
             f'**→ `Horário total trabalhado`: {str(horas).zfill(2)} horas e {str(minutos).zfill(2)} minutos**',
             colour=discord.Colour.red())
 
