@@ -1,4 +1,3 @@
-# type: ignore
 import asyncio
 from itertools import cycle
 import json
@@ -40,7 +39,7 @@ async def on_member_join(member: discord.Member):
             data = json.load(f)
         channel = client.get_channel(int(data["welcome_channel"]))
         embed = discord.Embed(title='Novo Membro!', description=f'Bem vindo ao servidor da Policia Militar BRAZZA {member.mention}!\n\n'
-                            '• ⚠ Se registre em <#1268404417359777843>!', color=discord.Colour.random())
+                            '• <:aviso:1269036173381206132> Se registre em <#1268404417359777843>!', color=discord.Colour.random())
         embed.set_footer(text='BRAZZA • Policia Militar • 2024')
         await channel.send(embed=embed)
         cargo = member.guild.get_role(int(data["autorole"]))
@@ -49,7 +48,7 @@ async def on_member_join(member: discord.Member):
 @client.event
 async def on_application_command_error(ctx: discord.ApplicationContext, error: discord.DiscordException):
     if isinstance(error, commands.NoPrivateMessage):
-        return await ctx.respond('**❌ ERRO!** Este comando não pode ser utilizado no privado.')
+        return await ctx.respond('**<a:x_:1269034170395394118> ERRO!** Este comando não pode ser utilizado no privado.')
 
     if isinstance(error, commands.CommandOnCooldown):
         if error.retry_after >= 3600:
@@ -58,10 +57,10 @@ async def on_application_command_error(ctx: discord.ApplicationContext, error: d
             tempo = f'{error.retry_after / 60:.1f} minutos'
         else:
             tempo = f'{error.retry_after} segundos'
-        return await ctx.respond(f'**❌ ERRO!** Este comando está em cooldown! Tente novamente em {tempo}!')
+        return await ctx.respond(f'**<a:x_:1269034170395394118> ERRO!** Este comando está em cooldown! Tente novamente em {tempo}!')
 
     if isinstance(error, commands.MissingAnyRole):
-        return await ctx.respond('**❌ ERRO!** Você não tem permissão para executar este comando.\n'
+        return await ctx.respond('**<a:x_:1269034170395394118> ERRO!** Você não tem permissão para executar este comando.\n'
                                  f'> Cargo Necessário: <@&{error.missing_roles[0]}>')
 
     if isinstance(error, commands.MissingPermissions):
@@ -69,7 +68,7 @@ async def on_application_command_error(ctx: discord.ApplicationContext, error: d
             "administrator": "Administrador",
             "manage_messages": "Gerenciar Mensagens"
         }
-        return await ctx.respond('**❌ ERRO!** Você não tem permissão para executar este comando.\n'
+        return await ctx.respond('**<a:x_:1269034170395394118> ERRO!** Você não tem permissão para executar este comando.\n'
                                  f'> Permissão Necessária: `{" - ".join([permissions[perm] for perm in error.missing_permissions])}`')
 
     canallog = client.get_channel(1268654669996232906)
@@ -89,7 +88,7 @@ async def prisao(ctx: discord.ApplicationContext,
                 pena: Option(str, 'Insira a pena e a multa aplicada', required=True),
                 foto: Option(discord.Attachment, 'Coloque uma foto do acusado', required=False)):
 
-    em = discord.Embed(colour=discord.Colour.brand_red(), description=f'**- 👮‍♂️ Policiais presentes:** **`{policias}`**\n'
+    em = discord.Embed(colour=discord.Colour.brand_red(), description=f'**- <:policia:1269035235463397397> Policiais presentes:** **`{policias}`**\n'
         f'**- 🔒 Cidadão detido:** **`{acusado}`**\n'
         f'**- 📜 Motivo da Prisão:** **`{motivo}`**\n**- ⚖️ Pena e Multa aplicada:** **`{pena}`**')
 
@@ -148,7 +147,7 @@ class embed_modal(Modal):
         embed.color = color()
         embed.set_footer(text='BRAZZA • Policia Militar • 2024', icon_url=client.user.display_avatar)
         await inter.channel.send(embed=embed)
-        await inter.response.send_message(f'✅ Embed criada com sucesso em {inter.channel.mention}!', ephemeral=True)
+        await inter.response.send_message(f'<a:check:1269034091882221710> Embed criada com sucesso em {inter.channel.mention}!', ephemeral=True)
 
 @client.slash_command(description='Limpa mensagens do canal', contexts={discord.InteractionContextType.guild})
 @commands.has_guild_permissions(manage_messages=True)
@@ -157,7 +156,7 @@ async def clear(ctx: discord.ApplicationContext,
     msgs = len(
         await ctx.channel.purge(limit=quantidade)
     )
-    await ctx.respond(f'Foram deletadas {msgs} mensagens!', delete_after=8.0)
+    await ctx.respond(f'<a:check:1269034091882221710> Foram deletadas {msgs} mensagens!', delete_after=8.0)
 
 @client.slash_command(description='[ADM] Seta o canal de entrada', contexts={discord.InteractionContextType.guild})
 @commands.has_guild_permissions(administrator=True)
@@ -168,7 +167,7 @@ async def setar_entrada(ctx: discord.ApplicationContext,
     data["welcome_channel"] = int(canal.id)
     with open(CONFIG_FILE, 'w') as f:
         json.dump(data, f, indent=4)
-    await ctx.respond(f'Sucesso! Canal de entrada definido em: {canal.mention}', delete_after=10.0)
+    await ctx.respond(f'<a:check:1269034091882221710> Sucesso! Canal de entrada definido em: {canal.mention}', delete_after=10.0)
 
 @client.slash_command(description='[ADM] Seta o cargo automático para quem entrar no discord', contexts={discord.InteractionContextType.guild})
 @commands.has_guild_permissions(administrator=True)
@@ -178,6 +177,6 @@ async def setar_autorole(ctx: discord.ApplicationContext, cargo: Option(discord.
     data["autorole"] = int(cargo.id)
     with open(CONFIG_FILE, 'w') as f:
         json.dump(data, f, indent=4)
-    await ctx.respond(f'Sucesso! Cargo inicial setado em {cargo.mention}', delete_after=10.0)
+    await ctx.respond(f'<a:check:1269034091882221710> Sucesso! Cargo inicial setado em {cargo.mention}', delete_after=10.0)
 
 client.run(TOKEN)

@@ -30,17 +30,17 @@ class BatePonto(commands.Cog):
                 f.seek(0)
                 json.dump(data, f, indent=4)
                 f.truncate()
-            await ctx.respond(f'Sucesso! Você adicionou `{horas}` horas e `{minutos}` minutos para {usuario.mention}.')
+            await ctx.respond(f'<a:check:1269034091882221710> Sucesso! Você adicionou `{horas}` horas e `{minutos}` minutos para {usuario.mention}.')
         except KeyError:
-            await ctx.respond(f'ERRO! O usuário {usuario.mention} não possui registro no banco de dados. Para se registrar é necessário abrir o bate-ponto pelo menos 1 vez.')
+            await ctx.respond(f'<a:x_:1269034170395394118> ERRO! O usuário {usuario.mention} não possui registro no banco de dados. Para se registrar é necessário abrir o bate-ponto pelo menos 1 vez.')
         else:
             try:
-                await usuario.send(f'**⚠ AVISO!** Você sofreu uma alteração nas horas patrulhadas!\n**→ Staff:** {ctx.author.mention}\n**→ Adicionou:** {horas} hora(s) e {minutos} minuto(s)\n**→ Motivo:** {motivo}\n\n`Em caso de problemas ou dúvidas, questione o staff mencionado acima.`')
+                await usuario.send(f'**<:aviso:1269036173381206132> AVISO!** Você sofreu uma alteração nas horas patrulhadas!\n**→ Staff:** {ctx.author.mention}\n**→ Adicionou:** {horas} hora(s) e {minutos} minuto(s)\n**→ Motivo:** {motivo}\n\n`Em caso de problemas ou dúvidas, questione o staff mencionado acima.`')
             except (discord.HTTPException, discord.Forbidden):
                 pass
             canal_log = ctx.guild.get_channel(1268404402654548069)
             embed_log = discord.Embed(description=f'**→ `Staff`: {ctx.author.mention}**\n**→ `Policial`: {usuario.mention}**\n'
-                f'**→ `Horas adicionadas`: {horas} horas e {minutos} minutos**\n**→ `Motivo inserido`: {motivo}**', colour=discord.Colour.green())
+                f'**→ `Horas adicionadas`: {horas} horas e {minutos} minutos**\n**→ `Motivo inserido`: {motivo}**', colour=discord.Colour.purple())
 
             embed_log.set_author(name='LOG: Adição de Horas', icon_url=self.client.user.display_avatar)
             await canal_log.send(embed=embed_log)
@@ -65,17 +65,17 @@ class BatePonto(commands.Cog):
                 f.seek(0)
                 json.dump(data, f, indent=4)
                 f.truncate()
-            await ctx.respond(f'Sucesso! Você removeu `{horas}` horas e `{minutos}` minutos de {usuario.mention}.')
+            await ctx.respond(f'<a:check:1269034091882221710> Sucesso! Você removeu `{horas}` horas e `{minutos}` minutos de {usuario.mention}.')
         except KeyError:
-            await ctx.respond(f'ERRO! O usuário {usuario.mention} não possui registro no banco de dados. Para se registrar é necessário abrir o bate-ponto pelo menos 1 vez.')
+            await ctx.respond(f'<a:x_:1269034170395394118> ERRO! O usuário {usuario.mention} não possui registro no banco de dados. Para se registrar é necessário abrir o bate-ponto pelo menos 1 vez.')
         else:
             try:
-                await usuario.send(f'**⚠ AVISO!** Você sofreu uma alteração nas horas patrulhadas!\n**→ Staff:** {ctx.author.mention}\n**→ Removeu:** {horas} hora(s) e {minutos} minuto(s)\n**→ Motivo:** {motivo}\n\n`Em caso de problemas ou dúvidas, questione o staff mencionado acima.`')
+                await usuario.send(f'**<:aviso:1269036173381206132> AVISO!** Você sofreu uma alteração nas horas patrulhadas!\n**→ Staff:** {ctx.author.mention}\n**→ Removeu:** {horas} hora(s) e {minutos} minuto(s)\n**→ Motivo:** {motivo}\n\n`Em caso de problemas ou dúvidas, questione o staff mencionado acima.`')
             except (discord.HTTPException, discord.Forbidden):
                 pass
             canal_log = ctx.guild.get_channel(1268404402654548069)
             embed_log = discord.Embed(description=f'**→ `Staff`: {ctx.author.mention}**\n**→ `Policial`: {usuario.mention}**\n'
-                f'**→ `Horas removidas`: {horas} horas e {minutos} minutos**\n**→ `Motivo inserido`: {motivo}**', colour=discord.Colour.red())
+                f'**→ `Horas removidas`: {horas} horas e {minutos} minutos**\n**→ `Motivo inserido`: {motivo}**', colour=discord.Colour.purple())
 
             embed_log.set_author(name='LOG: Redução de Horas', icon_url=self.client.user.display_avatar)
             await canal_log.send(embed=embed_log)
@@ -90,7 +90,7 @@ class BatePonto(commands.Cog):
         bateponto = data["bateponto"]
         ranking = sorted(bateponto.items(), key=lambda i: i[1]["tempo_semanal"], reverse=True)
         ranking = ranking[:limit]
-        embed = discord.Embed(title='Ranking - Horas Semanais', description='**Exibindo em ordem decrescente os oficiais com maior tempo de patrulha dessa semana.**\n\n')
+        embed = discord.Embed(title='Ranking - Horas Semanais <:relogio:1269034530388574309>', description='**Exibindo em ordem decrescente os oficiais com maior tempo de patrulha dessa semana.**\n\n')
         for num, i in enumerate(ranking, start=1):
             hr = int(i[1]["tempo_semanal"] // 3600)
             mins = int((i[1]["tempo_semanal"] % 3600) // 60)
@@ -149,13 +149,13 @@ class batePonto(View):
     @discord.ui.button(label='Começar', emoji='▶️', style=discord.ButtonStyle.success, custom_id="button_start")
     async def start_callback(self, button, inter: discord.Interaction):
         if inter.user.id in self._bateponto:
-            return await inter.response.send_message('⚠ Você já iniciou o seu bate-ponto!', ephemeral=True)
+            return await inter.response.send_message('<:aviso:1269036173381206132> Você já iniciou o seu bate-ponto!', ephemeral=True)
         await inter.response.defer()
 
         horario = int(datetime.datetime.now(timezone('America/Sao_Paulo')).timestamp())
 
-        embed = discord.Embed(description=f'**→ 👮‍♂️ Oficial:** {inter.user.mention}\n\n'
-                              f'**→ ⏰ Iniciado em:** <t:{horario}> (<t:{horario}:R>)\n\n'
+        embed = discord.Embed(description=f'**→ <:policia:1269035235463397397> Oficial:** {inter.user.mention}\n\n'
+                              f'**→ <:relogio:1269034530388574309> Iniciado em:** <t:{horario}> (<t:{horario}:R>)\n\n'
                               '**❗ Quando encerrar sua patrulha, encerre o bate-ponto no botão abaixo**',
                               color=discord.Colour.green())
         embed.set_author(name=f'Bate-Ponto de {inter.user}', icon_url=inter.user.display_avatar)
@@ -167,7 +167,7 @@ class batePonto(View):
 
         canal_log = inter.guild.get_channel(1268404402654548069)
         embed_log = discord.Embed(description=f'**→ `Status Bate-Ponto`: Aberto**\n**→ `Policial`: {inter.user.mention}**\n'
-            f'**→ `Horário`: {datetime.datetime.now(timezone("America/Sao_Paulo")).strftime("%d/%m/%Y, %H:%M:%S")}**\n', colour=discord.Colour.blue())
+            f'**→ `Horário`: {datetime.datetime.now(timezone("America/Sao_Paulo")).strftime("%d/%m/%Y, %H:%M:%S")}**\n', colour=discord.Colour.green())
 
         embed_log.set_author(name=f'LOG: Bate-Ponto aberto por: {inter.user.name}', icon_url=inter.user.display_avatar)
         await canal_log.send(embed=embed_log)
@@ -212,11 +212,11 @@ class finalizarPonto(View):
                                 f'**→ `Horário`: {datetime.datetime.now(timezone("America/Sao_Paulo")).strftime("%d/%m/%Y, %H:%M:%S")}**\n**→ `Horário total trabalhado`: {str(horas).zfill(2)} horas e {str(minutos).zfill(2)} minutos**', colour=discord.Colour.yellow())
                             embed_log.set_author(name='LOG: Bate-Ponto fechado por Alto Comando/Staff', icon_url=inter.user.display_avatar)
                             await canal_log.send(embed=embed_log)
-                            await user.send(f'**⚠ AVISO:** Seu bate-ponto foi finalizado por: {inter.user.mention}!\nTome cuidado em deixar o bate-ponto aberto ao sair de patrulha. Em caso de dúvidas, procure o responsável por ter finalizado o seu ponto.\n\n**`OBS`:** Suas horas não foram contabilizadas.')
+                            await user.send(f'**<:aviso:1269036173381206132> AVISO:** Seu bate-ponto foi finalizado por: {inter.user.mention}!\n<:sirene:1269032464374829087>Tome cuidado em deixar o bate-ponto aberto ao sair de patrulha. Em caso de dúvidas, procure o responsável por ter finalizado o seu ponto.\n> <:relogio:1269034530388574309> Tempo com bate-ponto aberto: **`{str(horas).zfill(2)} horas`** e **`{str(minutos).zfill(2)} minutos`**\n**`OBS`:** Suas horas não foram contabilizadas.')
                         except (KeyError, discord.HTTPException, discord.Forbidden):
                             pass
                         await inter.message.delete()
-                        return await inter.response.send_message('**Bate-ponto finalizado!** As horas não foram contabilizadas.', ephemeral=True)
+                        return await inter.response.send_message('<a:check:1269034091882221710> **Bate-ponto finalizado!** As horas não foram contabilizadas.', ephemeral=True)
                     break
 
         if inter.user.id not in self._bateponto:
@@ -240,7 +240,7 @@ class finalizarPonto(View):
             json.dump(data, f, indent=4)
             f.truncate()
 
-        await inter.response.send_message(f'**✅ Bate-ponto fechado!**\nTempo total de PTR: `{horas}` horas e `{minutos}` minutos', ephemeral=True)
+        await inter.response.send_message(f'<a:check:1269034091882221710> **Bate-ponto finalizado!**\n<:relogio:1269034530388574309> Tempo total de PTR: `{horas}` horas e `{minutos}` minutos', ephemeral=True)
 
         canal_log = inter.guild.get_channel(1268404402654548069)
 
@@ -268,16 +268,16 @@ class batePontoModal(Modal):
             return
         if self.change_hours:
             if not (self.children[0].value).isdigit() or not (self.children[1].value).isdigit() or not (self.children[2].value).isdigit():
-                return await inter.response.send_message('**❌ ERRO!** Insira apenas números!')
+                return await inter.response.send_message('**<a:x_:1269034170395394118> ERRO!** Insira apenas números!')
         else:
             if not (self.children[0].value).isdigit():
-                return await inter.response.send_message('**❌ ERRO!** Insira apenas números!')
+                return await inter.response.send_message('**<a:x_:1269034170395394118> ERRO!** Insira apenas números!')
 
 
         with open('db.json', 'r+') as f:
             data = json.load(f)
             if self.children[0].value not in data["bateponto"]:
-                return await inter.response.send_message('**❌ ERRO!** Esse usuário ainda não está cadastrado no bate-ponto.')
+                return await inter.response.send_message('**<a:x_:1269034170395394118> ERRO!** Esse usuário ainda não está cadastrado no bate-ponto.')
             try:
                 if self.change_hours:
                     total = (int(self.children[1].value) * 60 * 60) + (int(self.children[2].value) * 60)    # Horas + Minutos           # type: ignore
@@ -285,12 +285,12 @@ class batePontoModal(Modal):
                 else:
                     data["bateponto"][self.children[0].value]["tempo_semanal"] = 0
             except KeyError:
-                return await inter.response.send_message('**❌ ERRO!** Você digitou um ID inválido')
+                return await inter.response.send_message('**<a:x_:1269034170395394118> ERRO!** Você digitou um ID inválido')
             f.seek(0)
             json.dump(data, f, indent=4)
             f.truncate()
             member = self.client.get_user(int(self.children[0].value))    # type: ignore
-            await inter.response.send_message(f'**✅ Sucesso!** Agora o usuário {member.mention} possui {str(self.children[1].value).zfill(2)}:{str(self.children[2].value).zfill(2)} horas trabalhadas!')
+            await inter.response.send_message(f'**<a:check:1269034091882221710> Sucesso!** Agora o usuário {member.mention} possui {str(self.children[1].value).zfill(2)}:{str(self.children[2].value).zfill(2)} horas trabalhadas!')
 
 
 class painelBatePonto(View):
@@ -304,7 +304,8 @@ class painelBatePonto(View):
         if inter.user.id != self.ctx.author.id:
             return
         await inter.response.defer()
-
+        channel_log = await inter.guild.get_channel(1268404400641015839)
+        await channel_log.send('Backup automático em json devido a um reset semanal.', file=discord.File('db.json'))
         with open('db.json', 'r+') as f:
             data = json.load(f)
             for i in data["bateponto"].values():
@@ -313,7 +314,7 @@ class painelBatePonto(View):
             json.dump(data, f, indent=4)
             f.truncate()
 
-        await inter.followup.send(f'✅ Sucesso! Você resetou a carga horária semanal de {len(data["bateponto"])} oficiais!')
+        await inter.followup.send(f'<a:check:1269034091882221710> Sucesso! Você resetou a carga horária semanal de {len(data["bateponto"])} oficiais!\n-# Caso deseja reverter o reset semanal, foi criado um backup automaticamente em <#1268404400641015839>.')
 
     @discord.ui.button(label='Reset Usuário', emoji='➖', style=discord.ButtonStyle.blurple)
     async def reset_user_callback(self, button, inter: discord.Interaction):
