@@ -17,12 +17,12 @@ with open(CONFIG_FILE, 'r') as f:
     TOKEN = config['token']
 
 async def att_status():
-    status = cycle(["🛠️ Desenvolvido por @mtz._", "⚔ BRAZZA PM"])
+    status = cycle(["🛠️ Desenvolvido por @mtz._", "⚔ BRAZZA BOPE"])
     while True:
         new_status = next(status)
         await client.change_presence(activity=discord.Game(name=new_status))
         await asyncio.sleep(40)
-        if new_status == "⚔ BRAZZA PM":  # Quando estiver no último status ↓
+        if new_status == "⚔ BRAZZA BOPE":  # Quando estiver no último status ↓
             users = client.get_guild(1267945413139238922).member_count
             await client.change_presence(activity=discord.Game(name=f'👮️ Gerenciando {users} policiais!'))
             await asyncio.sleep(50)
@@ -38,9 +38,9 @@ async def on_member_join(member: discord.Member):
         with open(CONFIG_FILE, 'r') as f:
             data = json.load(f)
         channel = client.get_channel(int(data["welcome_channel"]))
-        embed = discord.Embed(title='Novo Membro!', description=f'Bem vindo ao servidor da Policia Militar BRAZZA {member.mention}!\n\n'
+        embed = discord.Embed(title='Novo Membro!', description=f'Bem vindo ao servidor do BRAZZA BOPE {member.mention}!\n\n'
                             '• <:aviso:1269036173381206132> Se registre em <#1268404417359777843>!', color=discord.Colour.random())
-        embed.set_footer(text='BRAZZA • Policia Militar • 2024')
+        embed.set_footer(text='BRAZZA • BOPE • 2024')
         await channel.send(embed=embed)
         cargo = member.guild.get_role(int(data["autorole"]))
         await member.add_roles(cargo)
@@ -96,7 +96,7 @@ async def prisao(ctx: discord.ApplicationContext,
     em.set_author(name=f'Relatório de prisão criado por: {ctx.author.name}', icon_url=ctx.author.display_avatar)
     if foto:
         em.set_image(url=foto.url)
-    em.set_footer(text=f'{datetime.now(pytz.timezone("America/Sao_Paulo")).strftime("%d/%m/%Y - %H:%M")} | BRAZZA Policia Militar')
+    em.set_footer(text=f'{datetime.now(pytz.timezone("America/Sao_Paulo")).strftime("%d/%m/%Y - %H:%M")} | BRAZZA BOPE')
     canal_prisao = ctx.guild.get_channel(1268404437366607946)
     msg = await canal_prisao.send(embed=em)
     await ctx.respond(f'**✅ Sucesso!** Relatório de prisão criado! {msg.jump_url}', ephemeral=True)
@@ -112,7 +112,7 @@ async def addrole(ctx: discord.ApplicationContext, cargo: Option(discord.Role, "
 @commands.has_guild_permissions(administrator=True)
 async def embed(ctx: discord.ApplicationContext):
     embed = discord.Embed(title='Gerenciador de Embed', description='**Para enviar uma mensagem com o mesmo visual que esta (padrão embed), clique no botão abaixo, e preencha apenas os campos que você deseja.**', color=discord.Colour.red())
-    embed.set_footer(text='BRAZZA • Policia Militar • 2024', icon_url=client.user.display_avatar)
+    embed.set_footer(text='BRAZZA • BOPE • 2024', icon_url=client.user.display_avatar)
     create_embed = Button(label='Criar Embed', style=discord.ButtonStyle.blurple, emoji='🛠')
     async def button_callback(inter: discord.Interaction):
         await inter.response.send_modal(embed_modal(ctx))
@@ -145,7 +145,7 @@ class embed_modal(Modal):
             embed.set_image(url=self.children[3].value)
 
         embed.color = color()
-        embed.set_footer(text='BRAZZA • Policia Militar • 2024', icon_url=client.user.display_avatar)
+        embed.set_footer(text='BRAZZA • BOPE • 2024', icon_url=client.user.display_avatar)
         await inter.channel.send(embed=embed)
         await inter.response.send_message(f'<a:check:1269034091882221710> Embed criada com sucesso em {inter.channel.mention}!', ephemeral=True)
 
