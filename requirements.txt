@@ -1,3 +1,4 @@
+aiosqlite
+audioop-lts
 py-cord
 pytz
-audioop-lts

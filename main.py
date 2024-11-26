@@ -154,7 +154,7 @@ class embed_modal(Modal):
 async def clear(ctx: discord.ApplicationContext,
                 quantidade: Option(int, 'Insira a quantidade de mensagens a serem deletadas', required=True)):
     msgs = len(
-        await ctx.channel.purge(limit=quantidade)
+        await ctx.channel.purge(limit=quantidade, bulk=True)
     )
     await ctx.respond(f'<a:check:1269034091882221710> Foram deletadas {msgs} mensagens!', delete_after=8.0)
 
