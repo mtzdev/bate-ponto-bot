@@ -116,7 +116,7 @@ class BatePonto(commands.Cog):
         user = ctx.author if _user is None else _user
         dados = await db.get_all_user_registries(user.id)
         if not dados:
-            return await ctx.respond('<a:x_:1269034170395394118> ERRO! O usuário {user.mention} ainda não possui nenhum ponto registrado.')
+            return await ctx.respond(f'<a:x_:1269034170395394118> ERRO! O usuário {user.mention} ainda não possui nenhum ponto registrado.')
 
         embed = discord.Embed(color=discord.Colour.gold(),
                             description=f'**Exibindo registros de bate-ponto de: {user.mention}**\n\n')
