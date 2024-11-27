@@ -72,14 +72,14 @@ class BatePonto(commands.Cog):
 
 
     @commands.slash_command(description='Visualiza as pessoas que mais tem horas semanais', contexts={discord.InteractionContextType.guild})
+    @commands.cooldown(1, 5, commands.BucketType.user)
     async def ranking(self, ctx: discord.ApplicationContext, limit: Option(int, "Insira um limite para o ranking. (Padrão: 10)", default=10, name='limite')):
         ranking = await db.get_ranking(limit)
         embed = discord.Embed(title='Ranking - Horas Semanais <:relogio:1269034530388574309>', description='**Exibindo em ordem decrescente os oficiais com maior tempo de patrulha dessa semana.**\n\n')
         for num, user in enumerate(ranking, start=1):
             hr = int(user[1] // 3600)
             mins = int((user[1] % 3600) // 60)
-            embed.description += f'> **• {num}º:** <@{user[0]}>: `Noneh` - `Nonem`\n'                        # type: ignore
-            # embed.description += f'> **• {num}º:** <@{user[0]}>: `{hr}h` - `{mins}m`\n'                        # type: ignore
+            embed.description += f'> **• {num}º:** <@{user[0]}>: `{hr}h` - `{mins}m`\n'                        # type: ignore
         await ctx.respond(embed=embed)
 
     @commands.slash_command(description='[ADM] Gerencia o sistema do bate-ponto', contexts={discord.InteractionContextType.guild})
@@ -93,6 +93,7 @@ class BatePonto(commands.Cog):
         await ctx.respond(embed=embed, view=painelBatePonto(ctx, self.client))
 
     @commands.slash_command(description='Consulta suas horas semanais', contexts={discord.InteractionContextType.guild})
+    @commands.cooldown(1, 3, commands.BucketType.user)
     async def consultar_horas(self, ctx, _user: Option(discord.Member, 'Selecione o usuário', required=False, name='usuário')):
         user = ctx.author if _user is None else _user
         hr = mins = segundos = 0
@@ -106,6 +107,28 @@ class BatePonto(commands.Cog):
                             f'**• Total de Horas: `{hr}`**\n**• Total de Minutos: `{mins}`**\n**• Total de Segundos: `{segundos}`**'
                             '\n\n**OBS:** Caso o usuário esteja com o bate-ponto aberto, o tempo acima pode não estar atualizado.')
         embed.set_author(name='Consultor de Horas semanais')
+        embed.set_footer(text='BRAZZA • BOPE • 2024', icon_url=self.client.user.display_avatar)
+        await ctx.respond(embed=embed)
+
+    @commands.slash_command(description='Consulta o histórico dos seus últimos pontos.', contexts={discord.InteractionContextType.guild})
+    @commands.cooldown(1, 3, commands.BucketType.user)
+    async def pontos(self, ctx, _user: Option(discord.Member, 'Selecione o usuário', required=False, name='usuário')):
+        user = ctx.author if _user is None else _user
+        dados = await db.get_all_user_registries(user.id)
+        if not dados:
+            return await ctx.respond('<a:x_:1269034170395394118> ERRO! O usuário {user.mention} ainda não possui nenhum ponto registrado.')
+
+        embed = discord.Embed(color=discord.Colour.gold(),
+                            description=f'**Exibindo registros de bate-ponto de: {user.mention}**\n\n')
+        for k in dados: # (started, finished, staff_finished, duration)
+            data_started = datetime.datetime.fromtimestamp(k[0], timezone("America/Sao_Paulo")).strftime("**%d/%m**: %H:%M **->**")
+            data_finished = datetime.datetime.fromtimestamp(k[1], timezone("America/Sao_Paulo")).strftime("%H:%M")
+            hr = str(k[3] // 3600).zfill(2)
+            mins = str((k[3] % 3600) // 60).zfill(2)
+            embed.description += f'> {data_started} {data_finished} `({hr}h:{mins}m)` {"\🟡" if k[2] else ""}\n'       # type: ignore
+        embed.description += '\n-# OBS: Pontos finalizados por staff possuirão o emoji \🟡 ao final da linha.'  # type: ignore
+
+        embed.set_author(name='Histório de Bate-Ponto')
         embed.set_footer(text='BRAZZA • BOPE • 2024', icon_url=self.client.user.display_avatar)
         await ctx.respond(embed=embed)
 
@@ -193,6 +216,7 @@ class finalizarPonto(View):
                             horas, minutos = int(segundos_totais // 3600), int((segundos_totais % 3600) // 60)
                             self._bateponto.pop(user_id)
                             user = inter.guild.get_member(int(user_id))
+                            await db.create_registry(int(user_id), horario_inicio, horario_atual, True)
                             canal_log = inter.guild.get_channel(1268404402654548069)
                             embed_log = discord.Embed(description=f'**→ `Status Bate-Ponto`: Fechado por {inter.user.mention}** *(horas não contabilizadas)*\n**→ `Policial`: {user.mention}**\n'
                                 f'**→ `Horário`: {datetime.datetime.now(timezone("America/Sao_Paulo")).strftime("%d/%m/%Y, %H:%M:%S")}**\n**→ `Horário total trabalhado`: {str(horas).zfill(2)} horas e {str(minutos).zfill(2)} minutos**', colour=discord.Colour.yellow())
@@ -220,6 +244,7 @@ class finalizarPonto(View):
         self._bateponto.pop(inter.user.id)
 
         await db.add_time(inter.user.id, segundos_totais)
+        await db.create_registry(inter.user.id, horario_inicio, horario_atual, False)
 
         await inter.response.send_message(f'<a:check:1269034091882221710> **Bate-ponto finalizado!**\n<:relogio:1269034530388574309> Tempo total de PTR: `{horas}` horas e `{minutos}` minutos', ephemeral=True)
 
@@ -277,7 +302,7 @@ class painelBatePonto(View):
         if inter.user.id != self.ctx.author.id:
             return
         await inter.response.defer()
-        channel_log = inter.guild.get_channel(1268654669996232906)
+        channel_log = inter.guild.get_channel(1268404400641015839)
         await channel_log.send('<:aviso:1269036173381206132> **Backup de proteção realizado!**\n`Motivo:` Reset semanal efetuado.', file=discord.File('db.sqlite3'))
         await db.reset_all_times()
 

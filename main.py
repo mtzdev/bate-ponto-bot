@@ -1,4 +1,5 @@
 import asyncio
+import aiohttp
 from itertools import cycle
 import json
 import discord
@@ -56,8 +57,12 @@ async def on_application_command_error(ctx: discord.ApplicationContext, error: d
         elif error.retry_after >= 60:
             tempo = f'{error.retry_after / 60:.1f} minutos'
         else:
-            tempo = f'{error.retry_after} segundos'
-        return await ctx.respond(f'**<a:x_:1269034170395394118> ERRO!** Este comando está em cooldown! Tente novamente em {tempo}!')
+            tempo = f'{round(error.retry_after)} segundos'
+        canallog = client.get_channel(1268654669996232906)
+        embedlog = discord.Embed(title='COOLDOWN!', description=f'Comando utilizado: `{ctx.command}`\nServidor: `{ctx.guild.name} / {ctx.guild.id}`\nCanal do comando: `{ctx.channel} / {ctx.channel.id}`\nAutor do comando: {ctx.author.mention} `/ {ctx.author.id}`\n\n**COOLDOWN de {tempo}**', color=discord.Colour.red())
+        embedlog.set_footer(text='Developed by mtz._')
+        await canallog.send(embed=embedlog)
+        return await ctx.respond(f'**<a:x_:1269034170395394118> ERRO!** Este comando está em cooldown! Tente novamente em `{tempo}`!', ephemeral=True)
 
     if isinstance(error, commands.MissingAnyRole):
         return await ctx.respond('**<a:x_:1269034170395394118> ERRO!** Você não tem permissão para executar este comando.\n'
@@ -157,6 +162,33 @@ async def clear(ctx: discord.ApplicationContext,
         await ctx.channel.purge(limit=quantidade, bulk=True)
     )
     await ctx.respond(f'<a:check:1269034091882221710> Foram deletadas {msgs} mensagens!', delete_after=8.0)
+
+@client.slash_command(description='Obtém quantidade de players atual no servidor', contexts={discord.InteractionContextType.guild})
+@commands.cooldown(1, 10, commands.BucketType.user)
+async def players(ctx: discord.ApplicationContext):
+    msg = await ctx.respond('<a:loading:1269034073444319355> Carregando informações do servidor...')
+    with open(CONFIG_FILE, 'r') as f:
+        data = json.load(f)
+    ip = data["server_ip"]
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(f'http://{ip}/players.json') as res:
+                player_count = len(json.loads(await res.text()))
+    except aiohttp.ClientError:
+        return await ctx.respond('<a:x_:1269034170395394118> ERRO! Ocorreu um problema ao contactar o servidor. Verifique se o IP está setado corretamente.')
+
+    await asyncio.sleep(1)
+    await msg.edit_original_response(content=f'**BRAZZA RJ - Jogadores Online:** {player_count}!\n[Clique Aqui para conectar](http://45.40.99.84:30120/)\n-# Atualizado nos últimos 10 segundos.')
+
+@client.slash_command(description='[ADM] Seta o ip do servidor', contexts={discord.InteractionContextType.guild})
+@commands.has_guild_permissions(administrator=True)
+async def setar_ip(ctx: discord.ApplicationContext, ip: Option(str, 'Insira o IP completo do servidor', required=True)):
+    with open(CONFIG_FILE, 'r') as f:
+        data = json.load(f)
+    data["server_ip"] = ip
+    with open(CONFIG_FILE, 'w') as f:
+        json.dump(data, f, indent=4)
+    await ctx.respond(f'<a:check:1269034091882221710> Sucesso! IP do servidor definido em: {ip}', delete_after=10.0)
 
 @client.slash_command(description='[ADM] Seta o canal de entrada', contexts={discord.InteractionContextType.guild})
 @commands.has_guild_permissions(administrator=True)
