@@ -1,6 +1,10 @@
 {
-    "token": "MTIwNjM4ODI0NDU1NjY4MTIyNg.GM3yzN.oignb7h2091I_nu4-6RO8y053Bn8h4wv1sUPEE",
-    "welcome_channel": 1268404413496692818,
+    "server_name": "Nome do Servidor",
+    "token": "TOKEN",
+    "welcome_channel": 0,
     "autorole": 0,
-    "server_ip": "45.40.99.84:30120"
+    "owner_id": 0,
+    "log_channel_id": 0,
+    "staff_role_id": 0,
+    "server_ip": "1.2.3.4:27015"
 }

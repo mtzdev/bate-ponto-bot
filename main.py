@@ -8,22 +8,20 @@ from discord.ext import commands
 from discord.commands import Option
 from discord.ui import InputText, Modal, Button, View
 from datetime import datetime
+from db import get_configs
 
-CONFIG_FILE = 'config.json'
 client = commands.Bot(command_prefix=".", help_command=None, intents=discord.Intents().all())
 client.load_extension('ponto')
 
-with open(CONFIG_FILE, 'r') as f:
-    config = json.load(f)
-    TOKEN = config['token']
+config = get_configs()
 
 async def att_status():
-    status = cycle(["🛠️ Desenvolvido por @mtz._", "⚔ BRAZZA BOPE"])
+    status = cycle(["🛠️ Desenvolvido por @mtz._", f"⚔ {config['server_name']}"])
     while True:
         new_status = next(status)
         await client.change_presence(activity=discord.Game(name=new_status))
         await asyncio.sleep(40)
-        if new_status == "⚔ BRAZZA BOPE":  # Quando estiver no último status ↓
+        if new_status == f"⚔ {config['server_name']}":  # Quando estiver no último status ↓
             users = client.get_guild(1267945413139238922).member_count
             await client.change_presence(activity=discord.Game(name=f'👮️ Gerenciando {users} policiais!'))
             await asyncio.sleep(50)
@@ -36,12 +34,12 @@ async def on_ready():
 @client.event
 async def on_member_join(member: discord.Member):
     if member.guild.id == 1267945413139238922:
-        with open(CONFIG_FILE, 'r') as f:
+        with open('config.json', 'r') as f:
             data = json.load(f)
         channel = client.get_channel(int(data["welcome_channel"]))
-        embed = discord.Embed(title='Novo Membro!', description=f'Bem vindo ao servidor do BRAZZA BOPE {member.mention}!\n\n'
+        embed = discord.Embed(title='Novo Membro!', description=f'Bem vindo ao servidor do {config['server_name']} {member.mention}!\n\n'
                             '• <:aviso:1269036173381206132> Se registre em <#1268404417359777843>!', color=discord.Colour.random())
-        embed.set_footer(text='BRAZZA • BOPE • 2024')
+        embed.set_footer(text=f'{config['server_name']} • 2024')
         await channel.send(embed=embed)
         cargo = member.guild.get_role(int(data["autorole"]))
         await member.add_roles(cargo)
@@ -58,10 +56,6 @@ async def on_application_command_error(ctx: discord.ApplicationContext, error: d
             tempo = f'{error.retry_after / 60:.1f} minutos'
         else:
             tempo = f'{round(error.retry_after)} segundos'
-        canallog = client.get_channel(1268654669996232906)
-        embedlog = discord.Embed(title='COOLDOWN!', description=f'Comando utilizado: `{ctx.command}`\nServidor: `{ctx.guild.name} / {ctx.guild.id}`\nCanal do comando: `{ctx.channel} / {ctx.channel.id}`\nAutor do comando: {ctx.author.mention} `/ {ctx.author.id}`\n\n**COOLDOWN de {tempo}**', color=discord.Colour.red())
-        embedlog.set_footer(text='Developed by mtz._')
-        await canallog.send(embed=embedlog)
         return await ctx.respond(f'**<a:x_:1269034170395394118> ERRO!** Este comando está em cooldown! Tente novamente em `{tempo}`!', ephemeral=True)
 
     if isinstance(error, commands.MissingAnyRole):
@@ -76,7 +70,7 @@ async def on_application_command_error(ctx: discord.ApplicationContext, error: d
         return await ctx.respond('**<a:x_:1269034170395394118> ERRO!** Você não tem permissão para executar este comando.\n'
                                  f'> Permissão Necessária: `{" - ".join([permissions[perm] for perm in error.missing_permissions])}`')
 
-    canallog = client.get_channel(1268654669996232906)
+    canallog = client.get_channel(config['log_channel_id'])
     if ctx.command is None:
         comando = "Nenhum/Invalído"
     else:
@@ -101,7 +95,7 @@ async def prisao(ctx: discord.ApplicationContext,
     em.set_author(name=f'Relatório de prisão criado por: {ctx.author.name}', icon_url=ctx.author.display_avatar)
     if foto:
         em.set_image(url=foto.url)
-    em.set_footer(text=f'{datetime.now(pytz.timezone("America/Sao_Paulo")).strftime("%d/%m/%Y - %H:%M")} | BRAZZA BOPE')
+    em.set_footer(text=f'{datetime.now(pytz.timezone("America/Sao_Paulo")).strftime("%d/%m/%Y - %H:%M")} | {config["server_name"]}')
     canal_prisao = ctx.guild.get_channel(1268404437366607946)
     msg = await canal_prisao.send(embed=em)
     await ctx.respond(f'**✅ Sucesso!** Relatório de prisão criado! {msg.jump_url}', ephemeral=True)
@@ -117,7 +111,7 @@ async def addrole(ctx: discord.ApplicationContext, cargo: Option(discord.Role, "
 @commands.has_guild_permissions(administrator=True)
 async def embed(ctx: discord.ApplicationContext):
     embed = discord.Embed(title='Gerenciador de Embed', description='**Para enviar uma mensagem com o mesmo visual que esta (padrão embed), clique no botão abaixo, e preencha apenas os campos que você deseja.**', color=discord.Colour.red())
-    embed.set_footer(text='BRAZZA • BOPE • 2024', icon_url=client.user.display_avatar)
+    embed.set_footer(text=f'{config["server_name"]} • 2024', icon_url=client.user.display_avatar)
     create_embed = Button(label='Criar Embed', style=discord.ButtonStyle.blurple, emoji='🛠')
     async def button_callback(inter: discord.Interaction):
         await inter.response.send_modal(embed_modal(ctx))
@@ -150,7 +144,7 @@ class embed_modal(Modal):
             embed.set_image(url=self.children[3].value)
 
         embed.color = color()
-        embed.set_footer(text='BRAZZA • BOPE • 2024', icon_url=client.user.display_avatar)
+        embed.set_footer(text=f'{config["server_name"]} • 2024', icon_url=client.user.display_avatar)
         await inter.channel.send(embed=embed)
         await inter.response.send_message(f'<a:check:1269034091882221710> Embed criada com sucesso em {inter.channel.mention}!', ephemeral=True)
 
@@ -167,7 +161,7 @@ async def clear(ctx: discord.ApplicationContext,
 @commands.cooldown(1, 10, commands.BucketType.user)
 async def players(ctx: discord.ApplicationContext):
     msg = await ctx.respond('<a:loading:1269034073444319355> Carregando informações do servidor...')
-    with open(CONFIG_FILE, 'r') as f:
+    with open('config.json', 'r') as f:
         data = json.load(f)
     ip = data["server_ip"]
     try:
@@ -178,15 +172,15 @@ async def players(ctx: discord.ApplicationContext):
         return await ctx.respond('<a:x_:1269034170395394118> ERRO! Ocorreu um problema ao contactar o servidor. Verifique se o IP está setado corretamente.')
 
     await asyncio.sleep(1)
-    await msg.edit_original_response(content=f'**BRAZZA RJ - Jogadores Online:** {player_count}!\n[Clique Aqui para conectar](http://45.40.99.84:30120/)\n-# Atualizado nos últimos 10 segundos.')
+    await msg.edit_original_response(content=f'**{config["server_name"]} - Jogadores Online:** {player_count}!\n[Clique Aqui para conectar](http://{config["server_ip"]}/)\n-# Atualizado nos últimos 10 segundos.')
 
 @client.slash_command(description='[ADM] Seta o ip do servidor', contexts={discord.InteractionContextType.guild})
 @commands.has_guild_permissions(administrator=True)
 async def setar_ip(ctx: discord.ApplicationContext, ip: Option(str, 'Insira o IP completo do servidor', required=True)):
-    with open(CONFIG_FILE, 'r') as f:
+    with open('config.json', 'r') as f:
         data = json.load(f)
     data["server_ip"] = ip
-    with open(CONFIG_FILE, 'w') as f:
+    with open('config.json', 'w') as f:
         json.dump(data, f, indent=4)
     await ctx.respond(f'<a:check:1269034091882221710> Sucesso! IP do servidor definido em: {ip}', delete_after=10.0)
 
@@ -194,21 +188,21 @@ async def setar_ip(ctx: discord.ApplicationContext, ip: Option(str, 'Insira o IP
 @commands.has_guild_permissions(administrator=True)
 async def setar_entrada(ctx: discord.ApplicationContext,
                         canal: Option(discord.TextChannel, 'Insira o canal de entrada', required=True)):
-    with open(CONFIG_FILE, 'r') as f:
+    with open('config.json', 'r') as f:
         data = json.load(f)
     data["welcome_channel"] = int(canal.id)
-    with open(CONFIG_FILE, 'w') as f:
+    with open('config.json', 'w') as f:
         json.dump(data, f, indent=4)
     await ctx.respond(f'<a:check:1269034091882221710> Sucesso! Canal de entrada definido em: {canal.mention}', delete_after=10.0)
 
 @client.slash_command(description='[ADM] Seta o cargo automático para quem entrar no discord', contexts={discord.InteractionContextType.guild})
 @commands.has_guild_permissions(administrator=True)
 async def setar_autorole(ctx: discord.ApplicationContext, cargo: Option(discord.Role, 'Selecione o cargo', required=True)):
-    with open(CONFIG_FILE, 'r') as f:
+    with open('config.json', 'r') as f:
         data = json.load(f)
     data["autorole"] = int(cargo.id)
-    with open(CONFIG_FILE, 'w') as f:
+    with open('config.json', 'w') as f:
         json.dump(data, f, indent=4)
     await ctx.respond(f'<a:check:1269034091882221710> Sucesso! Cargo inicial setado em {cargo.mention}', delete_after=10.0)
 
-client.run(TOKEN)
+client.run(config['token'])

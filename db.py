@@ -1,4 +1,5 @@
 import aiosqlite
+import json
 
 class Database:
     def __init__(self, db_connection):
@@ -67,3 +68,8 @@ class Database:
                 await cursor.execute('DELETE FROM pontos')
                 await cursor.execute('UPDATE sqlite_sequence set seq = 0 WHERE name = "pontos"')
                 await conn.commit()
+
+def get_configs():
+    with open('config.json', 'r') as f:
+        config = json.load(f)
+    return config
